@@ -71,10 +71,8 @@ class Worker1(QThread):
     def run(self):
         try:
             self.ThreadActive = True
-            sio.on(
-                "frame_transmit", self.handle_frame
-            )  # Listen to the 'frame' event from the server
-            print("start listening")  # Keep listening for incoming frames
+            sio.on("frame_transmit", self.handle_frame)
+            print("start listening")
             sio.wait()
         except Exception as e:
             print(f"Error connecting to server: {e}")

@@ -32,21 +32,6 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import time
 
-# uri = "http://127.0.0.1:5000/"
-
-# sio = socketio.Client()
-
-
-# @sio.event
-# def connect():
-#     print("Đã kết nối với server")
-
-
-# Xử lý sự kiện khi ngắt kết nối
-# @sio.event
-# def disconnect():
-#     print("Đã ngắt kết nối với server")
-
 
 class Worker1(QThread):
     ImageUpdate = pyqtSignal(QImage)
@@ -118,52 +103,48 @@ class Worker1(QThread):
 
             # Convert the image from BGR to RGB as required by the TFLite model.
             rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            # mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_image)
 
-            # # Run object detection using the model.
-            # detector.detect_async(mp_image, counter)
-            # current_frame = mp_image.numpy_view()
-            # current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
+            # Run object detection using the model.
+            detector.detect_async(mp_image, counter)
+            current_frame = mp_image.numpy_view()
+            current_frame = cv2.cvtColor(current_frame, cv2.COLOR_RGB2BGR)
 
-            # # Calculate the FPS
-            # if counter % fps_avg_frame_count == 0:
-            #     end_time = time.time()
-            #     fps = fps_avg_frame_count / (end_time - start_time)
-            #     start_time = time.time()
+            # Calculate the FPS
+            if counter % fps_avg_frame_count == 0:
+                end_time = time.time()
+                fps = fps_avg_frame_count / (end_time - start_time)
+                start_time = time.time()
 
-            # # Show the FPS
-            # fps_text = "FPS = {:.1f}".format(fps)
-            # text_location = (left_margin, row_size)
-            # cv2.putText(
-            #     current_frame,
-            #     fps_text,
-            #     text_location,
-            #     cv2.FONT_HERSHEY_PLAIN,
-            #     font_size,
-            #     text_color,
-            #     font_thickness,
-            # )
+            # Show the FPS
+            fps_text = "FPS = {:.1f}".format(fps)
+            text_location = (left_margin, row_size)
+            cv2.putText(
+                current_frame,
+                fps_text,
+                text_location,
+                cv2.FONT_HERSHEY_PLAIN,
+                font_size,
+                text_color,
+                font_thickness,
+            )
 
-            # if detection_result_list:
-            #     # print(detection_result_list)
-            #     vis_image = visualize(current_frame, detection_result_list[0])
-            #     # print((vis_image))
-            #     # print(vis_image.shape())
+            if detection_result_list:
+                # print(detection_result_list)
+                vis_image = visualize(current_frame, detection_result_list[0])
+                # print((vis_image))
+                # print(vis_image.shape())
 
-            #     # Convert the image to QImage format
+                # Convert the image to QImage format
 
-            # else:
-            #     vis_image = current_frame
-            # # newimg = cv2.imread(vis_image)
-            # # print()
-            # # newimg = cv2.cvtColor(vis_image, cv2.COLOR_BGR2RGB)
-            # # newimg = cv2.cvtColor(vis_image, cv2.COLOR_RGB2BGR)
-            cv2.imshow("test", rgb_image)
+            else:
+                vis_image = current_frame
+            cv2.imshow("test", vis_image)
             converted_img = QImage(
-                rgb_image.data,
-                rgb_image.shape[1],
-                rgb_image.shape[0],
-                rgb_image.strides[0],
+                vis_image.data,
+                vis_image.shape[1],
+                vis_image.shape[0],
+                vis_image.strides[0],
                 QImage.Format_RGBA8888,
             )
             # Resize the image to fit the UI
@@ -254,8 +235,6 @@ class App(QMainWindow):
         direction.setStretch(1, 3)
 
         self.graphic = QLabel()
-        # self.scene = QGraphicsScene()
-        # self.graphic.setScene(self.scene)
         self.graphic.setStyleSheet("border: 2px solid green; background-color: gray")
         self.label = QLabel("THIS IS A DEMO")
         self.button = QPushButton("Connect")
@@ -324,18 +303,12 @@ class App(QMainWindow):
         self.button.setEnabled(True)
 
     def update_image(self, image_data):
-        # print("img", image_data)
-        # self.scene.clear()
+
         self.graphic.setPixmap(QPixmap.fromImage(image_data))
 
 
 application = QApplication(sys.argv)
 Root = App()
-
-
-# @sio.event
-# def frame_transmit(data):
-#     Root.updateImage(data)
 
 
 if __name__ == "__main__":
